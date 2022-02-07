@@ -1,0 +1,29 @@
+.Stopwatch {
+  border-bottom: 1px solid var(--sidebar-border);
+  margin-bottom: 1rem;
+  padding: 1rem;
+}
+
+.task-project-input {
+  display: flex;
+  flex-direction: row;
+  border-bottom: 1px solid grey;
+  padding-bottom: 0.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.clock-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
+.editable-input {
+  flex-grow: 2;
+}
+.project-select {
+  z-index: 10000;
+  flex-grow: 1;
+}

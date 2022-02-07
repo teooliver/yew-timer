@@ -1,0 +1,24 @@
+.Controls {
+  white-space: nowrap;
+}
+
+.Controls button {
+  border: none;
+  padding: unset;
+  background-color: transparent;
+  height: 2rem;
+  margin-left: 0.4rem;
+  cursor: pointer;
+}
+
+.Controls button .play-btn {
+  color: var(--btn-primary);
+}
+
+.Controls button .stop-btn {
+  color: lightcoral;
+}
+
+.Controls button .reset-btn {
+  color: var(--gray);
+}
