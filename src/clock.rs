@@ -6,8 +6,9 @@ use gloo::{
 use yew::{classes, html, Component, Context, Html, Properties};
 
 pub enum Msg {
-    StartTimeout,
+    StopInterval,
     StartInterval,
+    RecordLap,
     Cancel,
     Done,
     Tick,
@@ -27,12 +28,14 @@ pub struct Clock {
     timeout: Option<Timeout>,
     console_timer: Option<Timer<'static>>,
     timer_array: Vec<u8>,
+    time_in_seconds: i16,
+    laps: Vec<String>,
 }
 
 impl Clock {
     fn get_current_time() -> String {
         let date = js_sys::Date::new_0();
-        console::log!("===> Date", date.clone());
+        // console::log!("===> Date", date.clone());
         String::from(date.to_locale_time_string("en-US"))
     }
 
@@ -63,12 +66,14 @@ impl Component for Clock {
             timeout: None,
             console_timer: None,
             timer_array: vec![0, 0, 0],
+            time_in_seconds: 0,
+            laps: vec![],
         }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            Msg::StartTimeout => {
+            Msg::StopInterval => {
                 let handle = {
                     let link = ctx.link().clone();
                     Timeout::new(3, move || link.send_message(Msg::Done))
@@ -96,10 +101,18 @@ impl Component for Clock {
                 self.messages.push("Interval started!");
                 true
             }
+
+            Msg::RecordLap => {
+                self.laps.push(self.time.clone());
+                true
+            }
+
             Msg::Cancel => {
                 self.cancel();
                 self.messages.push("Canceled!");
                 console::warn!("Canceled!");
+                self.time_in_seconds = 0;
+                self.laps = [].to_vec();
                 true
             }
             Msg::Done => {
@@ -115,6 +128,7 @@ impl Component for Clock {
             }
             Msg::Tick => {
                 self.messages.push("Tick...");
+                self.time_in_seconds = self.time_in_seconds + 1;
 
                 true
             }
@@ -129,35 +143,40 @@ impl Component for Clock {
         // let has_job = self.timeout.is_some() || self.interval.is_some();
         let has_job = false;
         html! {
-              <>
-              <div class={classes!("clock")}>
-                // <span>{ Self::timer_in_sec() }</span>
-                // <span class={classes!("time-text")}>{ &ctx.props().timer_array[0] }</span>
-                // <span>{":"}</span>
-                // <span class={classes!("time-text")}>{ &ctx.props().timer_array[1] }</span>
-                // <span>{":"}</span>
-                // <span class={classes!("time-text")}>{ &ctx.props().timer_array[2] }</span>
-              </div>
-              <div>
-                <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StartTimeout)}>
-                { "Start Timeout" }
-                </button>
-                <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StartInterval)}>
-                { "Start Interval" }
-                </button>
-                <button disabled={!has_job} onclick={ctx.link().callback(|_| Msg::Cancel)}>
-                { "Cancel!" }
-                </button>
-              </div>
-               <div id="wrapper">
+              <div class="stopwatch">
+                <div id="clock">
                     <div id="time">
                         { &self.time }
                     </div>
-                    <div id="messages">
-                        { for self.messages.iter().map(|message| html! { <p>{ message }</p> }) }
-                    </div>
                 </div>
-              </>
+                <div>
+                    <span class={classes!("clock")} >{self.time_in_seconds}</span>
+                    // <span>{ Self::timer_in_sec() }</span>
+                    // <span class={classes!("time-text")}>{ &ctx.props().timer_array[0] }</span>
+                    // <span>{":"}</span>
+                    // <span class={classes!("time-text")}>{ &ctx.props().timer_array[1] }</span>
+                    // <span>{":"}</span>
+                    // <span class={classes!("time-text")}>{ &ctx.props().timer_array[2] }</span>
+                </div>
+                <div>
+                    <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StopInterval)} class="stop-btn">
+                    { "Stop" }
+                    </button>
+                    <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StartInterval)} class="start-btn">
+                    { "Start" }
+                    </button>
+                    <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::RecordLap)} class="lap-btn">
+                    { "Lap" }
+                    </button>
+                    <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::Cancel)} class="cancel-btn">
+                    { "Cancel!" }
+                    </button>
+                </div>
+                <div id="messages">
+                    { for self.laps.iter().map(|lap| html! { <p>{ lap }</p> }) }
+                </div>
+
+              </div>
               // <div className={styles.Controls}>
         //   {isPlaying ? (
         //     <button onClick={handleStopButton} data-testid='stop-button'>
