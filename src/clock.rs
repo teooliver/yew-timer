@@ -12,8 +12,9 @@ pub enum Msg {
     Cancel,
     Done,
     Tick,
-    UpdateTime,
+    StartClock,
     StopClock,
+    UpdateTime,
 }
 
 #[derive(Clone, PartialEq, Properties)]
@@ -24,7 +25,7 @@ pub struct Props {
 pub struct Clock {
     time: String,
     messages: Vec<&'static str>,
-    standalone: Interval,
+    standalone: Option<Interval>,
     interval: Option<Interval>,
     timeout: Option<Timeout>,
     console_timer: Option<Timer<'static>>,
@@ -49,15 +50,13 @@ impl Component for Clock {
     type Properties = Props;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let clock_handle = {
-            let link = ctx.link().clone();
-            Interval::new(1, move || link.send_message(Msg::UpdateTime))
-        };
+        let link = ctx.link().clone();
+        link.send_message(Msg::StartClock);
 
         Self {
             time: Clock::get_current_time(),
             messages: Vec::new(),
-            standalone: clock_handle,
+            standalone: None,
             interval: None,
             timeout: None,
             console_timer: None,
@@ -68,6 +67,29 @@ impl Component for Clock {
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
+            Msg::StartClock => {
+                let handle = {
+                    let link = ctx.link().clone();
+                    Interval::new(1, move || link.send_message(Msg::UpdateTime))
+                };
+
+                self.standalone = Some(handle);
+
+                console::log!("Start Clock");
+            }
+
+            Msg::UpdateTime => {
+                self.time = Clock::get_current_time();
+            }
+
+            Msg::StopClock => {
+                if let Some(timer) = self.standalone.take() {
+                    drop(timer);
+                }
+
+                console::log!("Stop Clock");
+            }
+
             Msg::StopInterval => {
                 let handle = {
                     let link = ctx.link().clone();
@@ -122,17 +144,6 @@ impl Component for Clock {
                 self.messages.push("Tick...");
                 self.time_in_seconds = self.time_in_seconds + 1;
             }
-
-            Msg::UpdateTime => {
-                self.time = Clock::get_current_time();
-            }
-            Msg::StopClock => {
-                // if let Some(clock_timer) = self.standalone.take() {
-                //     drop(self._standalone);
-                // }
-
-                console::log!("x");
-            }
         }
         true
     }
@@ -143,28 +154,34 @@ impl Component for Clock {
         html! {
           <div class="stopwatch">
             <div id="clock">
-                <div id="time">
+                <div id="time" class="time">
                     { &self.time }
                 </div>
+                <div>
+                    <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StartClock)} class="cancel-btn">
+                        { "Start Clock" }
+                    </button>
+                    <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StopClock)} class="cancel-btn">
+                        { "Stop Clock" }
+                    </button>
+                </div>
             </div>
+            <hr class="hr" />
             <div>
-                <span class={classes!("clock")} >{self.time_in_seconds}</span>
+                <span class={classes!("counter")} >{self.time_in_seconds}</span>
             </div>
             <div>
                 <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StopInterval)} class="stop-btn">
-                { "Stop" }
+                    { "Stop" }
                 </button>
                 <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StartInterval)} class="start-btn">
-                { "Start" }
+                    { "Start" }
                 </button>
                 <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::RecordLap)} class="lap-btn">
-                { "Lap" }
+                    { "Lap" }
                 </button>
                 <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::Cancel)} class="cancel-btn">
-                { "Cancel!" }
-                </button>
-                <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StopClock)} class="cancel-btn">
-                { "Stop Clock" }
+                    { "Cancel" }
                 </button>
             </div>
             <div id="messages">

@@ -42,11 +42,19 @@ button:hover {
   background-color: #89b0bd;
 }
 
-.clock {
+.time {
+  font-size: 3rem;
+}
+
+.counter {
   font-size: 4rem;
 }
 
 .stopwatch {
   width: fit-content;
   margin: auto;
+}
+
+.hr {
+  margin: 2rem 0;
 }
