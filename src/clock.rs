@@ -152,42 +152,45 @@ impl Component for Clock {
         // let has_job = self.timeout.is_some() || self.interval.is_some();
         let has_job = false;
         html! {
-          <div class="stopwatch">
-            <div id="clock">
-                <div id="time" class="time">
-                    { &self.time }
+            <>
+            // <h1>{"Rust Clock Example"}</h1>
+            <div class="stopwatch">
+                <div id="clock">
+                    <div id="time" class="time">
+                        { &self.time }
+                    </div>
+                    <div>
+                        <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StartClock)} class="cancel-btn">
+                            { "Start Clock" }
+                        </button>
+                        <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StopClock)} class="cancel-btn">
+                            { "Stop Clock" }
+                        </button>
+                    </div>
+                </div>
+                <hr class="hr" />
+                <div>
+                    <span class={classes!("counter")} >{self.time_in_seconds}</span>
                 </div>
                 <div>
-                    <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StartClock)} class="cancel-btn">
-                        { "Start Clock" }
+                    <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StopInterval)} class="stop-btn">
+                        { "Stop" }
                     </button>
-                    <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StopClock)} class="cancel-btn">
-                        { "Stop Clock" }
+                    <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StartInterval)} class="start-btn">
+                        { "Start" }
+                    </button>
+                    <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::RecordLap)} class="lap-btn">
+                        { "Lap" }
+                    </button>
+                    <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::Cancel)} class="cancel-btn">
+                        { "Cancel" }
                     </button>
                 </div>
+                <div id="messages">
+                    { for self.laps.iter().map(|lap| html! { <p>{ lap }</p> }) }
+                </div>
             </div>
-            <hr class="hr" />
-            <div>
-                <span class={classes!("counter")} >{self.time_in_seconds}</span>
-            </div>
-            <div>
-                <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StopInterval)} class="stop-btn">
-                    { "Stop" }
-                </button>
-                <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StartInterval)} class="start-btn">
-                    { "Start" }
-                </button>
-                <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::RecordLap)} class="lap-btn">
-                    { "Lap" }
-                </button>
-                <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::Cancel)} class="cancel-btn">
-                    { "Cancel" }
-                </button>
-            </div>
-            <div id="messages">
-                { for self.laps.iter().map(|lap| html! { <p>{ lap }</p> }) }
-            </div>
-          </div>
+            </>
         }
     }
 }
