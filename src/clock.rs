@@ -2,10 +2,17 @@ use gloo::{
     console::{self, Timer},
     timers::callback::{Interval, Timeout},
 };
+use web_sys::HtmlInputElement as InputElement;
 
-use yew::{classes, html, Component, Context, Html, Properties};
+use yew::{
+    classes, events::KeyboardEvent, html, html::Scope, Component, Context, Html, Properties,
+    TargetCast,
+};
+
+use crate::icons::play_circle::PlayCircle;
 
 pub enum Msg {
+    AddTask(String),
     StopInterval,
     StartInterval,
     RecordLap,
@@ -31,6 +38,7 @@ pub struct Clock {
     console_timer: Option<Timer<'static>>,
     time_in_seconds: i16,
     laps: Vec<String>,
+    tasks: Vec<String>,
 }
 
 impl Clock {
@@ -42,6 +50,26 @@ impl Clock {
     fn cancel(&mut self) {
         self.timeout = None;
         self.interval = None;
+    }
+
+    fn view_input(&self, link: &Scope<Self>) -> Html {
+        let onkeypress = link.batch_callback(|e: KeyboardEvent| {
+            if e.key() == "Enter" {
+                let input: InputElement = e.target_unchecked_into();
+                let value = input.value();
+                input.set_value("");
+                Some(Msg::AddTask(value))
+            } else {
+                None
+            }
+        });
+        html! {
+            <input
+                class="new-todo"
+                placeholder="What needs to be done?"
+                {onkeypress}
+            />
+        }
     }
 }
 
@@ -62,11 +90,17 @@ impl Component for Clock {
             console_timer: None,
             time_in_seconds: 0,
             laps: vec![],
+            tasks: vec![],
         }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
+            Msg::AddTask(description) => {
+                if !description.is_empty() {
+                    self.tasks.push(description.trim().to_string());
+                }
+            }
             Msg::StartClock => {
                 let handle = {
                     let link = ctx.link().clone();
@@ -155,6 +189,11 @@ impl Component for Clock {
             <>
             // <h1>{"Rust Clock Example"}</h1>
             <div class="stopwatch">
+              { self.view_input(ctx.link()) }
+            <PlayCircle color="green" />
+                <div id="messages">
+                    { for self.tasks.iter().map(|lap| html! { <p>{ lap }</p> }) }
+                </div>
                 <div id="clock">
                     <div id="time" class="time">
                         { &self.time }
@@ -167,6 +206,7 @@ impl Component for Clock {
                             { "Stop Clock" }
                         </button>
                     </div>
+
                 </div>
                 <hr class="hr" />
                 <div>
