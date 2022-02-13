@@ -4,14 +4,14 @@ use gloo::{
 };
 use web_sys::HtmlInputElement as InputElement;
 
+use crate::icons::play_circle::PlayCircle;
+use crate::icons::stop_circle::StopCircle;
+use crate::icons::x_circle::XCircle;
+use crate::utils::format_time::calculate_timer;
 use yew::{
     classes, events::KeyboardEvent, html, html::Scope, Component, Context, Html, Properties,
     TargetCast,
 };
-
-use crate::icons::play_circle::PlayCircle;
-use crate::icons::stop_circle::StopCircle;
-use crate::icons::x_circle::XCircle;
 
 pub enum Msg {
     AddTask(String),
@@ -41,7 +41,7 @@ pub struct Clock {
     time_in_seconds: i16,
     laps: Vec<String>,
     tasks: Vec<String>,
-    is_playing: bool,
+    is_tracking: bool,
 }
 
 impl Clock {
@@ -94,7 +94,7 @@ impl Component for Clock {
             time_in_seconds: 0,
             laps: vec![],
             tasks: vec![],
-            is_playing: false,
+            is_tracking: false,
         }
     }
 
@@ -129,7 +129,7 @@ impl Component for Clock {
             }
 
             Msg::StopInterval => {
-                self.is_playing = false;
+                self.is_tracking = false;
                 let handle = {
                     let link = ctx.link().clone();
                     Timeout::new(1, move || link.send_message(Msg::Done))
@@ -154,7 +154,7 @@ impl Component for Clock {
                 self.messages.clear();
                 console::clear!();
 
-                self.is_playing = true;
+                self.is_tracking = true;
                 self.messages.push("Interval started!");
             }
 
@@ -191,6 +191,7 @@ impl Component for Clock {
     fn view(&self, ctx: &Context<Self>) -> Html {
         // let has_job = self.timeout.is_some() || self.interval.is_some();
         let has_job = false;
+        let timer = calculate_timer(self.time_in_seconds as usize);
         html! {
             <>
             // <h1>{"Rust Clock Example"}</h1>
@@ -215,11 +216,18 @@ impl Component for Clock {
               </div>
               <hr class="hr" />
               <div>
-              <span class={classes!("counter")} >{self.time_in_seconds}</span>
+                <span class={classes!("counter")} >{self.time_in_seconds}</span>
+              </div>
+              <div>
+                <span>{&timer[0]}</span>
+                <span>{":"}</span>
+                <span>{&timer[1]}</span>
+                <span>{":"}</span>
+                <span>{&timer[2]}</span>
               </div>
               <div>
                 {
-                    if self.is_playing {
+                    if self.is_tracking {
                         html! {
                             <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StopInterval)} class="stop-btn">
                             <StopCircle color="green" />
