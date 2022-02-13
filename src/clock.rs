@@ -17,7 +17,6 @@ pub enum Msg {
     AddTask(String),
     StopInterval,
     StartInterval,
-    RecordLap,
     Cancel,
     Done,
     Tick,
@@ -159,10 +158,6 @@ impl Component for Clock {
                 self.messages.push("Interval started!");
             }
 
-            Msg::RecordLap => {
-                self.laps.push(self.time_in_seconds.to_string().clone());
-            }
-
             Msg::Cancel => {
                 self.cancel();
                 self.messages.push("Canceled!");
@@ -216,9 +211,6 @@ impl Component for Clock {
 
               </div>
               <hr class="hr" />
-            //   <div>
-            //     <span class={classes!("counter")} >{self.time_in_seconds}</span>
-            //   </div>
               <div class={classes!("counter")}>
                 <span>{&timer[0]}</span>
                 <span>{":"}</span>
