@@ -10,6 +10,8 @@ use yew::{
 };
 
 use crate::icons::play_circle::PlayCircle;
+use crate::icons::stop_circle::StopCircle;
+use crate::icons::x_circle::XCircle;
 
 pub enum Msg {
     AddTask(String),
@@ -39,6 +41,7 @@ pub struct Clock {
     time_in_seconds: i16,
     laps: Vec<String>,
     tasks: Vec<String>,
+    is_playing: bool,
 }
 
 impl Clock {
@@ -91,6 +94,7 @@ impl Component for Clock {
             time_in_seconds: 0,
             laps: vec![],
             tasks: vec![],
+            is_playing: false,
         }
     }
 
@@ -125,6 +129,7 @@ impl Component for Clock {
             }
 
             Msg::StopInterval => {
+                self.is_playing = false;
                 let handle = {
                     let link = ctx.link().clone();
                     Timeout::new(1, move || link.send_message(Msg::Done))
@@ -149,6 +154,7 @@ impl Component for Clock {
                 self.messages.clear();
                 console::clear!();
 
+                self.is_playing = true;
                 self.messages.push("Interval started!");
             }
 
@@ -190,40 +196,48 @@ impl Component for Clock {
             // <h1>{"Rust Clock Example"}</h1>
             <div class="stopwatch">
               { self.view_input(ctx.link()) }
-            <PlayCircle color="green" />
-                <div id="messages">
-                    { for self.tasks.iter().map(|lap| html! { <p>{ lap }</p> }) }
-                </div>
-                <div id="clock">
-                    <div id="time" class="time">
-                        { &self.time }
-                    </div>
-                    <div>
-                        <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StartClock)} class="cancel-btn">
-                            { "Start Clock" }
-                        </button>
-                        <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StopClock)} class="cancel-btn">
-                            { "Stop Clock" }
-                        </button>
-                    </div>
+              <div id="messages">
+              { for self.tasks.iter().map(|lap| html! { <p>{ lap }</p> }) }
+              </div>
+              <div id="clock">
+              <div id="time" class="time">
+              { &self.time }
+              </div>
+              <div>
+              <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StartClock)} class="cancel-btn">
+              { "Start Clock" }
+              </button>
+              <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StopClock)} class="cancel-btn">
+              { "Stop Clock" }
+              </button>
+              </div>
 
-                </div>
-                <hr class="hr" />
-                <div>
-                    <span class={classes!("counter")} >{self.time_in_seconds}</span>
-                </div>
-                <div>
-                    <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StopInterval)} class="stop-btn">
-                        { "Stop" }
-                    </button>
-                    <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StartInterval)} class="start-btn">
-                        { "Start" }
-                    </button>
+              </div>
+              <hr class="hr" />
+              <div>
+              <span class={classes!("counter")} >{self.time_in_seconds}</span>
+              </div>
+              <div>
+                {
+                    if self.is_playing {
+                        html! {
+                            <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StopInterval)} class="stop-btn">
+                            <StopCircle color="green" />
+                            </button>
+                        }
+                    } else {
+                        html! {
+                        <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StartInterval)} class="start-btn">
+                            <PlayCircle color="green" />
+                        </button>
+                        }
+                    }
+                }
                     <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::RecordLap)} class="lap-btn">
                         { "Lap" }
                     </button>
                     <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::Cancel)} class="cancel-btn">
-                        { "Cancel" }
+                        <XCircle color="green" />
                     </button>
                 </div>
                 <div id="messages">
