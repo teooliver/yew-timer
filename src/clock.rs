@@ -105,6 +105,7 @@ impl Component for Clock {
                     self.tasks.push(description.trim().to_string());
                 }
             }
+
             Msg::StartClock => {
                 let handle = {
                     let link = ctx.link().clone();
@@ -215,10 +216,10 @@ impl Component for Clock {
 
               </div>
               <hr class="hr" />
-              <div>
-                <span class={classes!("counter")} >{self.time_in_seconds}</span>
-              </div>
-              <div>
+            //   <div>
+            //     <span class={classes!("counter")} >{self.time_in_seconds}</span>
+            //   </div>
+              <div class={classes!("counter")}>
                 <span>{&timer[0]}</span>
                 <span>{":"}</span>
                 <span>{&timer[1]}</span>
@@ -241,9 +242,9 @@ impl Component for Clock {
                         }
                     }
                 }
-                    <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::RecordLap)} class="lap-btn">
-                        { "Lap" }
-                    </button>
+                    // <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::RecordLap)} class="lap-btn">
+                    //     { "Lap" }
+                    // </button>
                     <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::Cancel)} class="cancel-btn">
                         <XCircle color="green" />
                     </button>

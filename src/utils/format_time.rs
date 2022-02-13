@@ -29,10 +29,21 @@ pub fn calculate_timer(time_in_seconds: usize) -> [String; 3] {
     [formated_hours, formated_minutes, formated_seconds]
 }
 
-// #[test]
-// fn it_works() {
-//     assert_eq!(
-//         calculate_timer(5000),
-//         ["13".to_owned(), "53".to_owned(), "20".to_owned()]
-//     );
-// }
+#[test]
+fn it_returns_hours_min_sec_values() {
+    // 60s -> 00:01:00
+    assert_eq!(
+        calculate_timer(60),
+        ["00".to_string(), "01".to_string(), "00".to_string()]
+    );
+    // 130s -> 00:03:10
+    assert_eq!(
+        calculate_timer(130),
+        ["00".to_string(), "02".to_string(), "10".to_string()]
+    );
+    // 50_000s -> 13:53:20
+    assert_eq!(
+        calculate_timer(50_000),
+        ["13".to_string(), "53".to_string(), "20".to_string()]
+    );
+}
