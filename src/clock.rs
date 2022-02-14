@@ -2,12 +2,13 @@ use gloo::{
     console::{self, Timer},
     timers::callback::{Interval, Timeout},
 };
+use js_sys::Date;
 use web_sys::HtmlInputElement as InputElement;
 
-use crate::icons::play_circle::PlayCircle;
 use crate::icons::stop_circle::StopCircle;
 use crate::icons::x_circle::XCircle;
 use crate::utils::format_time::calculate_timer;
+use crate::{icons::play_circle::PlayCircle, types::tasks::Task};
 use yew::{
     classes, events::KeyboardEvent, html, html::Scope, Component, Context, Html, Properties,
     TargetCast,
@@ -20,9 +21,6 @@ pub enum Msg {
     Cancel,
     Done,
     Tick,
-    StartClock,
-    StopClock,
-    UpdateTime,
 }
 
 #[derive(Clone, PartialEq, Properties)]
@@ -39,6 +37,7 @@ pub struct Clock {
     console_timer: Option<Timer<'static>>,
     time_in_seconds: i16,
     laps: Vec<String>,
+    current_task: Task,
     tasks: Vec<String>,
     is_tracking: bool,
 }
@@ -60,6 +59,7 @@ impl Clock {
                 let input: InputElement = e.target_unchecked_into();
                 let value = input.value();
                 input.set_value("");
+
                 Some(Msg::AddTask(value))
             } else {
                 None
@@ -79,10 +79,7 @@ impl Component for Clock {
     type Message = Msg;
     type Properties = Props;
 
-    fn create(ctx: &Context<Self>) -> Self {
-        let link = ctx.link().clone();
-        link.send_message(Msg::StartClock);
-
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {
             time: Clock::get_current_time(),
             messages: Vec::new(),
@@ -94,38 +91,28 @@ impl Component for Clock {
             laps: vec![],
             tasks: vec![],
             is_tracking: false,
+            current_task: Task {
+                name: None,
+                project: None,
+                initial_time: None,
+                end_time: None,
+            },
         }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            Msg::AddTask(description) => {
-                if !description.is_empty() {
-                    self.tasks.push(description.trim().to_string());
+            Msg::AddTask(task_name) => {
+                if !task_name.is_empty() {
+                    self.current_task = Task {
+                        name: Some(task_name),
+                        project: None,
+                        initial_time: self.current_task.initial_time.clone(),
+                        end_time: Some(js_sys::Date::new_0()),
+                    };
+                    console::log!("=====>", self.current_task.to_string());
+                    // self.tasks.push(task_name.trim().to_string());
                 }
-            }
-
-            Msg::StartClock => {
-                let handle = {
-                    let link = ctx.link().clone();
-                    Interval::new(1, move || link.send_message(Msg::UpdateTime))
-                };
-
-                self.standalone = Some(handle);
-
-                console::log!("Start Clock");
-            }
-
-            Msg::UpdateTime => {
-                self.time = Clock::get_current_time();
-            }
-
-            Msg::StopClock => {
-                if let Some(timer) = self.standalone.take() {
-                    drop(timer);
-                }
-
-                console::log!("Stop Clock");
             }
 
             Msg::StopInterval => {
@@ -154,6 +141,7 @@ impl Component for Clock {
                 self.messages.clear();
                 console::clear!();
 
+                self.current_task.initial_time = Some(js_sys::Date::new_0());
                 self.is_tracking = true;
                 self.messages.push("Interval started!");
             }
@@ -169,6 +157,7 @@ impl Component for Clock {
             Msg::Done => {
                 self.cancel();
                 self.messages.push("Done!");
+                // let endTime = new Date();
 
                 console::info!("Done!");
                 if let Some(timer) = self.console_timer.take() {
@@ -197,17 +186,7 @@ impl Component for Clock {
               { for self.tasks.iter().map(|lap| html! { <p>{ lap }</p> }) }
               </div>
               <div id="clock">
-              <div id="time" class="time">
-              { &self.time }
-              </div>
-              <div>
-              <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StartClock)} class="cancel-btn">
-              { "Start Clock" }
-              </button>
-              <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::StopClock)} class="cancel-btn">
-              { "Stop Clock" }
-              </button>
-              </div>
+
 
               </div>
               <hr class="hr" />
@@ -234,9 +213,7 @@ impl Component for Clock {
                         }
                     }
                 }
-                    // <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::RecordLap)} class="lap-btn">
-                    //     { "Lap" }
-                    // </button>
+
                     <button disabled={has_job} onclick={ctx.link().callback(|_| Msg::Cancel)} class="cancel-btn">
                         <XCircle color="green" />
                     </button>

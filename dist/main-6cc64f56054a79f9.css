@@ -28,9 +28,11 @@ button:hover {
 .stop-btn {
   background-color: coral;
 }
+
 .stop-btn:hover {
   background-color: salmon;
 }
+
 .stop-btn:active {
   background-color: darksalmon;
 }
@@ -38,6 +40,7 @@ button:hover {
 .cancel-btn {
   background-color: #add8e6;
 }
+
 .cancel-btn:active {
   background-color: #89b0bd;
 }
