@@ -648,6 +648,7 @@ dependencies = [
  "gloo 0.6.0",
  "js-sys",
  "libmath",
+ "wasm-bindgen",
  "web-sys",
  "yew",
 ]

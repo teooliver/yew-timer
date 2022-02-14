@@ -1,6 +1,5 @@
-use std::fmt;
-
 use js_sys::Date;
+use wasm_bindgen::JsValue;
 
 pub struct Task {
     pub name: Option<String>,
@@ -12,15 +11,14 @@ pub struct Task {
 impl Task {
     pub fn to_string(&self) -> String {
         let date = Date::new_0();
-        // let x = self.initial_time.as_ref().unwrap_or_else(|| &date);
         format!(
-            "name:{}, project:{}, initial_time: {:?}, end_time:{:?}",
+            "Task {{ name: {}, project: {}, initial_time: {}, end_time: {} }}",
             self.name.as_ref().unwrap_or(&"".to_string()),
             self.project.as_ref().unwrap_or(&"None".to_string()),
             self.initial_time
                 .as_ref()
                 .unwrap_or_else(|| &date)
-                .to_date_string(),
+                .to_iso_string(),
             self.end_time
                 .as_ref()
                 .unwrap_or_else(|| &date)
@@ -28,32 +26,18 @@ impl Task {
         )
     }
 }
-
-// impl fmt::Display for Task {
-//     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-//         f.write_str(self.name.clone().unwrap_or("".to_string()).as_str())
-//     }
-// }
-
-// impl fmt::Debug for Task {
-//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//         f.debug_struct("Task")
-//             .field("name", &self.name)
-//             .field("project", &self.project)
-//             .field("initial_time", &self.initial_time)
-//             .field("end_time", &self.end_time)
-//             .finish()
-//     }
-// }
-
-// assert_eq!(
-//     "Foo { bar: 10, baz: \"Hello World\", addr: 127.0.0.1 }",
+// #[test]
+// fn it_converts_to_string() {
+//     assert_eq!(
+//     "Task { name: Name, project: None, initial_time: 2022-02-14T23:01:46.258Z, end_time: 2022-02-14T23:01:46.258Z }",
 //     format!(
-//         "{:?}",
-//         Task {
-//             bar: 10,
-//             baz: "Hello World".to_string(),
-//             addr: Ipv4Addr::new(127, 0, 0, 1),
-//         }
+//       "{:?}",
+//       Task {
+//         name: Some("Name".to_string()),
+//         project: None,
+//         initial_time: Some(Date::new(&JsValue::from_str("2022-02-14T23:01:46.258Z"))),
+//         end_time: Some(Date::new(&JsValue::from_str("2022-02-14T23:01:46.258Z")))
+//       }.to_string()
 //     )
-// );
+//   );
+// }
