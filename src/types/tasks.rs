@@ -50,7 +50,7 @@ use serde_json::Value;
 #[serde(rename_all = "camelCase")]
 pub struct GetAllTasks {
     pub results: Vec<Result>,
-    pub pagination: Pagination,
+    pub pagination: Option<Pagination>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]

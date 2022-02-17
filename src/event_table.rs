@@ -7,30 +7,43 @@ use yew::{function_component, html, use_effect_with_deps, use_state, Callback, P
 
 #[function_component(EventTable)]
 pub fn event_table() -> Html {
-    // let tasks_hello: GetAllTasks;
+    let counter = use_state(|| GetAllTasks {
+        results: vec![],
+        pagination: None,
+    });
 
-    // {
-    //     let tasks = tasks_hello.clone();
-    //     use_effect_with_deps(
-    //         move |_| {
-    //             let tasks = tasks.clone();
-    //             wasm_bindgen_futures::spawn_local(async move {
-    //                 let fetched_tasks: GetAllTasks =
-    //                     Request::get("localhost:5000/tasks/group?page=1")
-    //                         .send()
-    //                         .await
-    //                         .unwrap()
-    //                         .json()
-    //                         .await
-    //                         .unwrap();
+    let use_name = use_state(|| "hello");
 
-    //                 tasks_hello = fetched_tasks;
-    //             });
-    //             || ()
-    //         },
-    //         (),
-    //     );
-    // }
+    {
+        // let tasks = counter.clone();
+        use_effect_with_deps(
+            move |_| {
+                wasm_bindgen_futures::spawn_local(async move {
+                    let response = reqwest::get("http://localhost:5000/tasks/group?page=1")
+                        .await
+                        .unwrap();
+
+                    let text = response.text().await.unwrap();
+
+                    let v: GetAllTasks = serde_json::from_str(&text).unwrap();
+                    let name = v.results[0].tasks[0].name.as_str();
+
+                    // untyped response option
+                    // let v: Value = serde_json::from_str(&text).unwrap();
+                    // let name = v["results"][0]["tasks"][0]["name"].as_str().unwrap();
+
+                    console::log!("use_effect", name);
+                    // tasks.set(v.clone());
+                    // counter.set(v.clone());
+                    // use_name.set(name.clone());
+                });
+                || ()
+            },
+            (),
+        );
+    }
+
+    // console::log!("jflsdjfs", use_name.clone().to_string());
 
     let onclick = Callback::from(|mouse_event: MouseEvent| {
         wasm_bindgen_futures::spawn_local(async move {
@@ -40,8 +53,13 @@ pub fn event_table() -> Html {
 
             let text = response.text().await.unwrap();
 
-            let v: Value = serde_json::from_str(&text).unwrap();
-            let name = v["results"][0]["tasks"][0]["name"].as_str().unwrap();
+            let v: GetAllTasks = serde_json::from_str(&text).unwrap();
+            let name = v.results[0].tasks[0].name.as_str();
+
+            // untyped response option
+            // let v: Value = serde_json::from_str(&text).unwrap();
+            // let name = v["results"][0]["tasks"][0]["name"].as_str().unwrap();
+
             console::log!(name);
         });
     });
@@ -52,6 +70,10 @@ pub fn event_table() -> Html {
            <div>
               <h3>{"Fetch tasks"}</h3>
               <button  onclick={onclick}>{ "xxxxx" }</button>
+              <p>
+              { "hello" }
+              //  {*counter.results[0].tasks[0].name.as_str().to_string()}
+              </p>
             </div>
         </>
     }
