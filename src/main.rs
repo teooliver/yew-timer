@@ -1,10 +1,7 @@
 mod app;
-mod clock;
+mod components;
 mod error;
-mod event_row;
-mod events_table;
 mod icons;
-mod test_component;
 mod types;
 mod utils;
 

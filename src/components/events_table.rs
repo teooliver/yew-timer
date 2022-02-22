@@ -1,4 +1,4 @@
-use crate::event_row::TableRow;
+use super::event_row::TableRow;
 use crate::types::tasks::GetAllTasks;
 use crate::{error::Error, utils::format_time::calculate_timer};
 use gloo::console;
