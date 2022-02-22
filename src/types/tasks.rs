@@ -1,6 +1,7 @@
 use js_sys::Date;
 // use wasm_bindgen::JsValue;
 
+// #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Task {
     pub name: Option<String>,
     pub project: Option<String>,

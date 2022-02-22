@@ -1,5 +1,6 @@
 use super::clock::Clock;
-use super::event_table::EventTable;
+use super::events_table::EventsTable;
+use super::test_component::Async;
 use yew::prelude::*;
 
 pub struct App;
@@ -16,7 +17,8 @@ impl Component for App {
         html! {
           <div class="main">
             <Clock timer_array={vec![2, 20, 10]}/>
-            <EventTable />
+            <EventsTable />
+            <Async />
           </div>
         }
     }
