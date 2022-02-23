@@ -279,7 +279,8 @@ h2 {
   display: inline-block;
 }
 
-.rigth-side {
+.right-side {
+  display: flex;
   position: absolute;
   background-color: var(--body-background);
   right: 0;
@@ -287,6 +288,10 @@ h2 {
   padding: 0.5rem 1rem;
   border-radius: 0.8rem;
   white-space: nowrap;
+}
+
+.right-side .separator {
+  margin: 0 0.2rem;
 }
 
 @media (max-width: 1024px) {

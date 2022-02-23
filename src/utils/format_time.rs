@@ -1,3 +1,4 @@
+use gloo::console::{self};
 use math::round;
 
 pub fn calculate_timer(time_in_seconds: usize) -> [String; 3] {
@@ -46,4 +47,36 @@ fn it_returns_hours_min_sec_values() {
         calculate_timer(50_000),
         ["13".to_string(), "53".to_string(), "20".to_string()]
     );
+}
+
+pub fn fix_two_digits(num: u32) -> String {
+    if num < 10 {
+        return format!("0{}", num.to_string());
+    }
+    num.to_string()
+}
+
+#[test]
+fn it_returns_fix_two_digits() {
+    assert_eq!(fix_two_digits(60), "60".to_string());
+    assert_eq!(fix_two_digits(10), "10".to_string());
+    assert_eq!(fix_two_digits(8), "08".to_string());
+}
+
+pub fn convert_time_to_am_pm(hour: u32) -> String {
+    let mut part_of_day = "".to_string();
+    let mut hours = 0;
+
+    if hour < 1 && <
+
+    if hour > 12 {
+        let part_of_day = "PM".to_string();
+
+    };
+
+    if hour < 12 {
+        let part_of_day = "AM".to_string();
+    };
+
+    return "error".to_string();
 }
