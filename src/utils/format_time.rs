@@ -65,18 +65,42 @@ fn it_returns_fix_two_digits() {
 
 pub fn convert_time_to_am_pm(hour: u32) -> String {
     let mut part_of_day = "".to_string();
-    let mut hours = 0;
+    let mut hours_display = 0;
 
-    if hour < 1 && <
+    if hour < 1 {
+        hours_display = hour + 12;
+    }
 
-    if hour > 12 {
-        let part_of_day = "PM".to_string();
+    if hour >= 1 && hour < 12 {
+        hours_display = hour;
+    }
 
+    if hour >= 12 && hour < 13 {
+        hours_display = hour;
+    }
+
+    if hour >= 13 && hour < 24 {
+        hours_display = hour - 12;
+    }
+
+    if hour >= 12 {
+        part_of_day = "PM".to_string();
     };
 
     if hour < 12 {
-        let part_of_day = "AM".to_string();
+        part_of_day = "AM".to_string();
     };
 
-    return "error".to_string();
+    todo!("recieve a Date and return a string in the format '10:30 PM'");
+    return format!("{} {}", hours_display, part_of_day);
+}
+
+#[test]
+fn it_convert_24h_time_to_am_pm() {
+    assert_eq!(convert_time_to_am_pm(0), "12 AM".to_string());
+    assert_eq!(convert_time_to_am_pm(1), "1 AM".to_string());
+    assert_eq!(convert_time_to_am_pm(10), "10 AM".to_string());
+    assert_eq!(convert_time_to_am_pm(12), "12 PM".to_string());
+    assert_eq!(convert_time_to_am_pm(13), "1 PM".to_string());
+    assert_eq!(convert_time_to_am_pm(20), "8 PM".to_string());
 }

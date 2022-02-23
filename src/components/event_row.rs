@@ -1,6 +1,6 @@
 use crate::{
     types::tasks::TaskResponse,
-    utils::format_time::{calculate_timer, fix_two_digits},
+    utils::format_time::{calculate_timer, convert_time_to_am_pm, fix_two_digits},
 };
 use gloo::console::{self};
 use js_sys::Date;
@@ -37,19 +37,21 @@ pub fn table_row(props: &Props) -> Html {
                 </div>
                 <div class="right-side">
                   <div>
-                    <span>{js_initial_time.get_hours()}</span>
-                    <span>{":"}</span>
-                    <span>{ fix_two_digits(js_initial_time.get_minutes())}</span>
-                  </div>
-                  <div>
+                    // <span>{js_initial_time.get_hours()}</span>
+                    // <span>{":"}</span>
+                    // <span>{ fix_two_digits(js_initial_time.get_minutes())}</span>
+                    <span>{ convert_time_to_am_pm(js_initial_time.get_hours())}</span>
+                    </div>
+                    <div>
                     <span class="separator">
-                      {"->"}
+                    {"->"}
                     </span>
-                  </div>
-                  <div>
-                    <span>{js_end_time.get_hours()}</span>
-                    <span>{":"}</span>
-                    <span>{fix_two_digits(js_end_time.get_minutes())}</span>
+                    </div>
+                    <div>
+                    // <span>{js_end_time.get_hours()}</span>
+                    // <span>{":"}</span>
+                    // <span>{fix_two_digits(js_end_time.get_minutes())}</span>
+                    <span>{ convert_time_to_am_pm(js_end_time.get_hours())}</span>
                   </div>
                     <span class="total">
                     {hours}{":"}{minutes}{":"}{seconds}
