@@ -28,8 +28,8 @@ pub fn events_table() -> Html {
             html! {
                 <>
                 {for data.results.iter().map(move |result| {
-                    let js_total_time = Date::new(&JsValue::from_str(&result.total_time.to_string()));
-                    let total_time_display = calculate_timer(js_total_time.clone().get_time() as usize);
+                    // let js_total_time = Date::new(&JsValue::from_str(&result.total_time.to_string()));
+                    let total_time_display = calculate_timer(result.total_time as usize);
                     let hours: String = total_time_display[0].clone();
                     let minutes: String = total_time_display[1].clone();
                     let seconds: String = total_time_display[2].clone();

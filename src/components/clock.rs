@@ -10,9 +10,11 @@ use crate::icons::x_circle::XCircle;
 use crate::utils::format_time::calculate_timer;
 use crate::{icons::play_circle::PlayCircle, types::tasks::Task};
 use yew::{
-    classes, events::KeyboardEvent, html, html::Scope, Component, Context, Html, Properties,
-    TargetCast,
+    classes, events::KeyboardEvent, html, html::Scope, Callback, Component, Context, Html,
+    Properties, TargetCast,
 };
+
+use super::clock_controls::ClockControls;
 
 pub enum Msg {
     AddTask(String),
@@ -73,6 +75,10 @@ impl Clock {
             />
         }
     }
+
+    // fn start_clock(&self, link: &Scope<Self>) {
+    //     Callback::from(link.callback(|msg: Msg| msg));
+    // }
 }
 
 impl Component for Clock {
@@ -175,6 +181,8 @@ impl Component for Clock {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         // let has_job = self.timeout.is_some() || self.interval.is_some();
+
+        let start_time = &ctx.link().callback(|_| Msg::StartInterval);
         let has_job = false;
         let timer = calculate_timer(self.time_in_seconds as usize);
         html! {
@@ -221,7 +229,8 @@ impl Component for Clock {
                 <div id="messages">
                     { for self.laps.iter().map(|lap| html! { <p>{ lap }</p> }) }
                 </div>
-            </div>
+              </div>
+              <ClockControls is_tracking={self.is_tracking} has_job={has_job} start_time={self.start_clock(ctx.link())} />
             </>
         }
     }

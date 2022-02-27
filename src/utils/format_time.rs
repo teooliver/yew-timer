@@ -1,4 +1,5 @@
 use gloo::console::{self};
+use js_sys::Date;
 use math::round;
 
 pub fn calculate_timer(time_in_seconds: usize) -> [String; 3] {
@@ -63,44 +64,62 @@ fn it_returns_fix_two_digits() {
     assert_eq!(fix_two_digits(8), "08".to_string());
 }
 
-pub fn convert_time_to_am_pm(hour: u32) -> String {
+pub fn convert_date_to_am_pm(hours: u32, minutes: u32) -> String {
+    let minutes = fix_two_digits(minutes);
+
     let mut part_of_day = "".to_string();
     let mut hours_display = 0;
 
-    if hour < 1 {
-        hours_display = hour + 12;
+    if hours < 1 {
+        hours_display = hours + 12;
     }
 
-    if hour >= 1 && hour < 12 {
-        hours_display = hour;
+    if hours >= 1 && hours < 12 {
+        hours_display = hours;
     }
 
-    if hour >= 12 && hour < 13 {
-        hours_display = hour;
+    if hours >= 12 && hours < 13 {
+        hours_display = hours;
     }
 
-    if hour >= 13 && hour < 24 {
-        hours_display = hour - 12;
+    if hours >= 13 && hours < 24 {
+        hours_display = hours - 12;
     }
 
-    if hour >= 12 {
+    if hours >= 12 {
         part_of_day = "PM".to_string();
     };
 
-    if hour < 12 {
+    if hours < 12 {
         part_of_day = "AM".to_string();
     };
 
-    todo!("recieve a Date and return a string in the format '10:30 PM'");
-    return format!("{} {}", hours_display, part_of_day);
+    // todo!("recieve a Date and return a string in the format '10:30 PM'");
+    return format!("{}:{} {}", hours_display.to_string(), minutes, part_of_day);
 }
 
 #[test]
-fn it_convert_24h_time_to_am_pm() {
-    assert_eq!(convert_time_to_am_pm(0), "12 AM".to_string());
-    assert_eq!(convert_time_to_am_pm(1), "1 AM".to_string());
-    assert_eq!(convert_time_to_am_pm(10), "10 AM".to_string());
-    assert_eq!(convert_time_to_am_pm(12), "12 PM".to_string());
-    assert_eq!(convert_time_to_am_pm(13), "1 PM".to_string());
-    assert_eq!(convert_time_to_am_pm(20), "8 PM".to_string());
+fn it_converts_date_time_to_am_pm() {
+    assert_eq!(convert_date_to_am_pm(10, 0), "10:00 AM".to_string());
+    assert_eq!(convert_date_to_am_pm(8, 30), "8:30 AM".to_string());
+    assert_eq!(convert_date_to_am_pm(0, 30), "12:30 AM".to_string());
+    assert_eq!(convert_date_to_am_pm(1, 0), "1:00 AM".to_string());
+    assert_eq!(convert_date_to_am_pm(12, 00), "12:00 PM".to_string());
+    assert_eq!(convert_date_to_am_pm(14, 30), "2:30 PM".to_string());
+    assert_eq!(convert_date_to_am_pm(21, 45), "9:45 PM".to_string());
+
+    // let mock_date = Date::new_with_year_month_day_hr_min_sec(2022, 01, 01, 14, 0, 0);
+    // assert_eq!(convert_date_to_am_pm(mock_date), "1 AM".to_string());
+
+    // let mock_date = Date::new_with_year_month_day_hr_min_sec(2022, 01, 01, 14, 0, 0);
+    // assert_eq!(convert_date_to_am_pm(mock_date), "10 AM".to_string());
+
+    // let mock_date = Date::new_with_year_month_day_hr_min_sec(2022, 01, 01, 14, 0, 0);
+    // assert_eq!(convert_date_to_am_pm(mock_date), "12 PM".to_string());
+
+    // let mock_date = Date::new_with_year_month_day_hr_min_sec(2022, 01, 01, 14, 0, 0);
+    // assert_eq!(convert_date_to_am_pm(mock_date), "1 PM".to_string());
+
+    // let mock_date = Date::new_with_year_month_day_hr_min_sec(2022, 01, 01, 14, 0, 0);
+    // assert_eq!(convert_date_to_am_pm(mock_date), "8 PM".to_string());
 }
